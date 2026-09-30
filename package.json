@@ -1,0 +1,48 @@
+{
+  "name": "omp-rig",
+  "version": "0.1.0",
+  "description": "Switch every omp model role and model pool at once from an interactive list",
+  "type": "module",
+  "license": "MIT",
+  "author": "Chaewan Kim",
+  "repository": "git+https://github.com/amsminn/omp-rig.git",
+  "homepage": "https://github.com/amsminn/omp-rig",
+  "bugs": {
+    "url": "https://github.com/amsminn/omp-rig/issues"
+  },
+  "keywords": [
+    "omp",
+    "oh-my-pi",
+    "omp-plugin",
+    "model-roles",
+    "presets",
+    "cli",
+    "tui"
+  ],
+  "omp": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "files": [
+    "src",
+    "README.md",
+    "README.zh-CN.md",
+    "README.ko.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@oh-my-pi/pi-coding-agent": "18.4.4",
+    "@oh-my-pi/pi-tui": "18.4.4",
+    "@types/bun": "^1.3.14",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@oh-my-pi/pi-coding-agent": ">=18.3.1 <19"
+  }
+}
