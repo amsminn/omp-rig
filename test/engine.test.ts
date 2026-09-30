@@ -615,3 +615,23 @@ describe("apply notifications", () => {
     expect(seen).toEqual(["rig:a", null])
   })
 })
+
+describe("tree navigation before an apply", () => {
+  test("restores the model and thinking level active right before the apply", async () => {
+    const item = await harness({ a: RIG_A }, { globalRoles: {} })
+    expect((await reconcile(item.env, { startup: true, runtimeOwned: {} })).ok).toBe(true)
+    item.session.model = CHAT_C
+    item.session.level = ThinkingLevel.XHigh
+
+    expect((await applyRig(source("a"), "session", item.env)).ok).toBe(true)
+    expect(item.session.model).toBe(CHAT_A)
+
+    item.entries.splice(0)
+    const result = await reconcile(item.env)
+
+    expect(result.ok).toBe(true)
+    expect(item.session.model).toBe(CHAT_C)
+    expect(item.session.level).toBe(ThinkingLevel.XHigh)
+    expect(item.settings.getModelRoles()).toEqual({})
+  })
+})

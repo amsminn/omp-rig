@@ -83,6 +83,8 @@ export type EngineResult = EngineSuccess | EngineFailure
 
 type EngineState = {
   baseline: RuntimeBaseline
+  /** Active model right before the plugin first wrote; restored when no default role remains. */
+  baselineModel: Model | undefined
   pluginWrote: boolean
   runtimeOwned: Readonly<Record<string, string>>
 }
@@ -112,6 +114,7 @@ function stateFor(environment: EngineEnvironment): EngineState {
       environment.handles,
       environment.pi.getThinkingLevel(),
     ),
+    baselineModel: environment.ctx.model,
     pluginWrote: false,
     runtimeOwned: {},
   }
@@ -391,6 +394,15 @@ async function applyTransaction(
   const validation = validateRig(activeRig, environment.ctx.modelRegistry)
   if (!validation.ok) return failure(validation.errors.map(error => error.message))
 
+  const current = stateFor(environment)
+  if (!current.pluginWrote) {
+    current.baseline = captureBaseline(
+      environment.settings,
+      environment.handles,
+      environment.pi.getThinkingLevel(),
+    )
+    current.baselineModel = environment.ctx.model
+  }
   const previous = snapshot(environment)
   const roles = expandedRoles(activeRig, environment, options.runtimeOwned)
   const pool = effectivePool(activeRig, environment.ctx.modelRegistry, options.runtimeOwned)
@@ -478,8 +490,11 @@ async function restoreSessionState(environment: EngineEnvironment): Promise<void
     else if (state.baseline.thinkingLevel !== undefined) {
       environment.pi.setThinkingLevel(state.baseline.thinkingLevel)
     }
-  } else if (state.baseline.thinkingLevel !== undefined) {
-    environment.pi.setThinkingLevel(state.baseline.thinkingLevel)
+  } else {
+    if (state.baselineModel !== undefined) await environment.pi.setModel(state.baselineModel)
+    if (state.baseline.thinkingLevel !== undefined) {
+      environment.pi.setThinkingLevel(state.baseline.thinkingLevel)
+    }
   }
   state.pluginWrote = false
   state.runtimeOwned = {}
