@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="160" viewBox="0 0 640 160" role="img" aria-label="omp-rig">
+  <title>omp-rig</title>
+  <g transform="translate(24 32)">
+    <rect x="0" y="0" width="96" height="96" rx="20" fill="none" stroke="#f0f3f6" stroke-width="8"/>
+    <rect x="22" y="24" width="52" height="10" rx="5" fill="#58a6ff"/>
+    <rect x="22" y="43" width="36" height="10" rx="5" fill="#f0f3f6"/>
+    <rect x="22" y="62" width="44" height="10" rx="5" fill="#f0f3f6"/>
+  </g>
+  <text x="148" y="110" fill="#f0f3f6" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="88" font-weight="700" letter-spacing="-2">omp<tspan fill="#58a6ff">-</tspan>rig</text>
+</svg>
