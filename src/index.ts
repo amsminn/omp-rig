@@ -17,6 +17,7 @@ import {
 } from "./host"
 import type { RigSource, ScopeEnvironment } from "./scope"
 import * as store from "./store"
+import { registerRigCommands } from "./commands"
 
 type LifecycleEvent =
   | "session_start"
@@ -103,6 +104,7 @@ export function omprig(
   let activeSource: RigSource | null = null
   let currentEnvironment: EngineEnvironment | undefined
   let currentContext: ExtensionContext | undefined
+  const rigCommands = registerRigCommands(pi, () => currentEnvironment)
 
   const setStatus = (
     ctx: ExtensionContext,
@@ -178,6 +180,7 @@ export function omprig(
     const environment = environmentFor(ctx, settings, handles)
     currentEnvironment = environment
     currentContext = ctx
+    await rigCommands.attach(ctx)
 
     const isStartup = event === "session_start" && !startupHandled
     const owned = isStartup ? dependencies.runtimeOwnedRoles(settings) : undefined
