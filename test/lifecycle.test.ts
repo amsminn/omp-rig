@@ -4,7 +4,7 @@ import type {
   ExtensionContext,
 } from "@oh-my-pi/pi-coding-agent"
 import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings"
-import { type EngineResult } from "../src/engine"
+import { type EngineEnvironment, type EngineResult, type EngineSuccess } from "../src/engine"
 import { resolveHandles } from "../src/host"
 import {
   omprig,
@@ -41,6 +41,7 @@ type Harness = Readonly<{
     notifications: Array<Readonly<{ message: string; level: string | undefined }>>
   }
   trigger: (event: EventName, context?: ExtensionContext) => Promise<void>
+  environment: () => EngineEnvironment | undefined
   subagentContext: () => ExtensionContext
   acpContext: () => ExtensionContext
 }>
@@ -84,6 +85,7 @@ async function createHarness(
   const handles = await resolveHandles()
   const handlers = new Map<EventName, Handler>()
   const results = [...(options.results ?? [success(null)])]
+  let lastEnvironment: EngineEnvironment | undefined
   const calls: Harness["calls"] = {
     labels: [],
     flags: [],
@@ -147,7 +149,8 @@ async function createHarness(
       calls.runtimeOwned += 1
       return { smol: "inferhub/glm-5.3" }
     },
-    reconcile: async (_environment, reconcileOptions = {}) => {
+    reconcile: async (environment, reconcileOptions = {}) => {
+      lastEnvironment = environment
       calls.reconciles.push(reconcileOptions)
       return results.shift() ?? success(null)
     },
@@ -169,6 +172,7 @@ async function createHarness(
     context,
     handlers,
     calls,
+    environment: () => lastEnvironment,
     trigger: async (event, selectedContext = context) => {
       const handler = handlers.get(event)
       if (handler === undefined) throw new Error(`${event} handler not registered`)
@@ -270,6 +274,18 @@ describe("omp-rig lifecycle", () => {
       "profile: work*",
       undefined,
     ])
+  })
+
+  test("updates the status when a command applies a source mid-session", async () => {
+    const harness = await createHarness()
+    await harness.trigger("session_start")
+    expect(harness.calls.statuses).toEqual([undefined])
+
+    harness.environment()?.onApplied?.(success({ kind: "profile", name: "p3" }) as EngineSuccess)
+    harness.environment()?.onApplied?.(success({ kind: "rig", name: "cn" }, ["smol"]) as EngineSuccess)
+    harness.environment()?.onApplied?.(success(null) as EngineSuccess)
+
+    expect(harness.calls.statuses).toEqual([undefined, "profile: p3", "rig: cn*", undefined])
   })
 
   test("normalizes a missing startup rig and keeps status empty", async () => {

@@ -55,6 +55,8 @@ export type EngineEnvironment = Readonly<{
   store: EngineStore
   scope: ScopeEnvironment
   argv?: readonly string[]
+  /** Called after a user-initiated apply, turn-off, or inherit succeeds. */
+  onApplied?: (result: EngineSuccess) => void
 }>
 
 export type EffectivePool = Readonly<{
@@ -457,7 +459,10 @@ export async function applyRig(
   } catch (error) {
     return failure([error instanceof Error ? error.message : String(error)])
   }
-  if (result.ok) stateFor(environment).runtimeOwned = {}
+  if (result.ok) {
+    stateFor(environment).runtimeOwned = {}
+    environment.onApplied?.(result)
+  }
   return result
 }
 
@@ -538,7 +543,7 @@ export async function turnOff(
   environment: EngineEnvironment,
 ): Promise<EngineResult> {
   await setMarker(scope, "default", environment.scope)
-  return reconcile(environment)
+  return notifyApplied(await reconcile(environment), environment)
 }
 
 export async function inherit(
@@ -546,7 +551,12 @@ export async function inherit(
   environment: EngineEnvironment,
 ): Promise<EngineResult> {
   await clearMarker(scope, environment.scope)
-  return reconcile(environment)
+  return notifyApplied(await reconcile(environment), environment)
+}
+
+function notifyApplied(result: EngineResult, environment: EngineEnvironment): EngineResult {
+  if (result.ok) environment.onApplied?.(result)
+  return result
 }
 
 export async function drift(environment: EngineEnvironment): Promise<readonly string[]> {

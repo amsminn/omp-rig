@@ -159,6 +159,10 @@ export function omprig(
       handles,
       store: dependencies.store,
       scope,
+      onApplied: result => {
+        activeSource = result.source
+        setStatus(ctx, activeSource, result.drift.length > 0)
+      },
     }
   }
 

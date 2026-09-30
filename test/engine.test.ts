@@ -598,3 +598,20 @@ describe("baseline view", () => {
     expect(baselineView(env).modelRoles.smol).toBe("p2/c")
   })
 })
+
+describe("apply notifications", () => {
+  test("notifies after a successful apply or turn-off and not after a failed apply", async () => {
+    const item = await harness({ a: RIG_A })
+    const seen: Array<string | null> = []
+    const env: EngineEnvironment = {
+      ...item.env,
+      onApplied: result => {
+        seen.push(result.source === null ? null : `${result.source.kind}:${result.source.name}`)
+      },
+    }
+    expect((await applyRig(source("a"), "session", env)).ok).toBe(true)
+    expect((await applyRig(source("missing"), "session", env)).ok).toBe(false)
+    expect((await turnOff("session", env)).ok).toBe(true)
+    expect(seen).toEqual(["rig:a", null])
+  })
+})
