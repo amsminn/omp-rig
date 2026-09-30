@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version increment
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Ensure current npm
+        run: |
+          required=11.5.1
+          installed="$(npm --version)"
+          if [ "$(printf '%s\n%s\n' "$required" "$installed" | sort -V | head -n 1)" != "$required" ]; then
+            npm install -g npm@latest
+          fi
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun test
+      - name: Configure release identity
+        run: |
+          git config user.name amsminn
+          git config user.email kim1109123@gmail.com
+      - name: Bump package version
+        id: version
+        run: |
+          npm version "${{ inputs.bump }}" --no-git-tag-version
+          echo "value=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Ensure version is unpublished
+        run: |
+          if npm view "omp-rig@${{ steps.version.outputs.value }}" version >/dev/null 2>&1; then
+            echo "omp-rig@${{ steps.version.outputs.value }} is already published"
+            exit 1
+          fi
+      - name: Prepare changelog
+        run: bun scripts/changelog.ts release "${{ steps.version.outputs.value }}"
+      - name: Commit and push release
+        run: |
+          version="${{ steps.version.outputs.value }}"
+          git commit -am "chore: release v$version"
+          git tag "v$version"
+          git push origin HEAD:main --follow-tags
+      - name: Publish package
+        run: npm publish --access public
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${{ steps.version.outputs.value }}"
+          gh release create "v$version" --notes "$(bun scripts/changelog.ts notes "$version")"
