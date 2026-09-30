@@ -1,5 +1,4 @@
 import type { ExtensionCommandContext } from "@oh-my-pi/pi-coding-agent"
-import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings"
 import {
   Container,
   matchesKey,
@@ -10,7 +9,7 @@ import {
   type SelectItem,
 } from "@oh-my-pi/pi-tui"
 import { getSelectListTheme } from "@oh-my-pi/pi-tui/theme"
-import {
+import { baselineView,
   applyRig,
   turnOff,
   type EngineEnvironment,
@@ -225,38 +224,21 @@ export function buildManagerItems(input: ManagerItemsInput): ManagerItem[] {
   return items
 }
 
-function rigFromSettings(
-  settings: EngineEnvironment["settings"],
-  environment: EngineEnvironment,
-): Rig {
-  const modelRoles = Object.fromEntries(
-    Object.entries(settings.getModelRoles())
-      .filter((entry): entry is [string, string] => entry[1] !== undefined),
-  )
+async function baselineRig(environment: EngineEnvironment): Promise<Rig> {
+  const view = baselineView(environment)
+  const modelRoles: Record<string, string> = { ...view.modelRoles }
   const activeModel = environment.ctx.model
-  const fallback = environment.settings.getModelRoles()["default"]
-    ?? (activeModel === undefined
-      ? undefined
-      : `${activeModel.provider}/${activeModel.id}`)
-  if (modelRoles["default"] === undefined && fallback !== undefined) {
-    modelRoles["default"] = fallback
+  if (modelRoles["default"] === undefined && activeModel !== undefined) {
+    modelRoles["default"] = `${activeModel.provider}/${activeModel.id}`
   }
   if (modelRoles["default"] === undefined) {
     throw new Error("Current setup has no default model role")
   }
   return {
     modelRoles,
-    enabledModels: [...environment.handles.enabledModels.get(settings)],
-    disabledProviders: [...environment.handles.disabledProviders.get(settings)],
+    enabledModels: [...view.enabledModels],
+    disabledProviders: [...view.disabledProviders],
   }
-}
-
-async function baselineRig(environment: EngineEnvironment): Promise<Rig> {
-  const settings = await Settings.loadReadOnly({
-    cwd: environment.scope.cwd,
-    agentDir: environment.scope.agentDir,
-  })
-  return rigFromSettings(settings, environment)
 }
 
 async function openActions(

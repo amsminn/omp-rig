@@ -13,6 +13,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import {
   applyRig,
+  baselineView,
   drift,
   effectivePool,
   inherit,
@@ -576,5 +577,24 @@ describe("role notes", () => {
   test("returns no notes when no rig is active", async () => {
     const { env } = await harness({ b: RIG_B })
     expect(await roleNotes(env)).toEqual({})
+  })
+})
+
+describe("baseline view", () => {
+  test("returns the user's own roles and pool while a rig is applied, without reloading settings", async () => {
+    const { env } = await harness({ a: RIG_A }, { globalRoles: { default: "p3/d", designer: "p1/a" } })
+    const before = baselineView(env)
+    expect(before.modelRoles).toEqual({ default: "p3/d", designer: "p1/a" })
+    expect((await applyRig(source("a"), "session", env)).ok).toBe(true)
+    const after = baselineView(env)
+    expect(after.modelRoles).toEqual({ default: "p3/d", designer: "p1/a" })
+    expect(after.enabledModels).toEqual([])
+    expect(after.disabledProviders).toEqual([])
+  })
+
+  test("keeps runtime values omp owned before the plugin wrote", async () => {
+    const { env } = await harness({ a: RIG_A }, { runtimeRoles: { smol: "p2/c" } })
+    expect((await applyRig(source("a"), "session", env)).ok).toBe(true)
+    expect(baselineView(env).modelRoles.smol).toBe("p2/c")
   })
 })

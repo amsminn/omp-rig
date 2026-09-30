@@ -586,3 +586,45 @@ export async function roleNotes(
   }
   return notes
 }
+
+/**
+ * The user's own settings with every plugin override removed, computed from the live layers
+ * (no settings reload): global, then project, then the runtime values omp owned before the plugin wrote.
+ */
+export function baselineView(environment: EngineEnvironment): Readonly<{
+  modelRoles: Readonly<Record<string, string>>
+  enabledModels: readonly string[]
+  disabledProviders: readonly string[]
+}> {
+  const state = stateFor(environment)
+  const settings = environment.settings
+  if (!state.pluginWrote) {
+    return {
+      modelRoles: definedRoles(settings.getModelRoles()),
+      enabledModels: environment.handles.enabledModels.get(settings),
+      disabledProviders: environment.handles.disabledProviders.get(settings),
+    }
+  }
+  const layers = [settings.getGlobalSettings(), settings.getProjectSettings()]
+  const modelRoles: Record<string, string> = {}
+  let enabledModels: readonly string[] = []
+  let disabledProviders: readonly string[] = []
+  for (const layer of layers) {
+    Object.assign(modelRoles, definedRoles(layer["modelRoles"]))
+    if (Array.isArray(layer["enabledModels"])) enabledModels = layer["enabledModels"].filter((item): item is string => typeof item === "string")
+    if (Array.isArray(layer["disabledProviders"])) disabledProviders = layer["disabledProviders"].filter((item): item is string => typeof item === "string")
+  }
+  Object.assign(modelRoles, state.baseline.modelRoles ?? {})
+  return {
+    modelRoles,
+    enabledModels: state.baseline.enabledModels ?? enabledModels,
+    disabledProviders: state.baseline.disabledProviders ?? disabledProviders,
+  }
+}
+
+function definedRoles(value: unknown): Record<string, string> {
+  if (value === null || typeof value !== "object") return {}
+  return Object.fromEntries(
+    Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === "string" && entry[1] !== ""),
+  )
+}
