@@ -23,6 +23,8 @@ import {
 } from "../scope"
 import * as store from "../store"
 import { healthOf, type RigHealth } from "../validate"
+import * as actionsUi from "./actions"
+import * as builderUi from "./builder"
 
 const PRIMARY_ROLES = ["default", "smol", "slow", "plan", "task"] as const
 const SCOPES = ["session", "project", "global"] as const
@@ -246,16 +248,7 @@ async function openActions(
   environment: EngineEnvironment,
   source: RigSource | null,
 ): Promise<void> {
-  const modulePath = "./actions"
-  const module = await import(modulePath) as Readonly<{
-    openActions?: (
-      context: ExtensionCommandContext,
-      env: EngineEnvironment,
-      selected: RigSource | null,
-    ) => Promise<void>
-  }>
-  if (module.openActions === undefined) throw new Error("Rig actions are unavailable")
-  await module.openActions(ctx, environment, source)
+  await actionsUi.openActions(ctx, environment, source)
 }
 
 async function openBuilder(
@@ -263,16 +256,7 @@ async function openBuilder(
   environment: EngineEnvironment,
   base: "empty" | "current",
 ): Promise<void> {
-  const modulePath = "./builder"
-  const module = await import(modulePath) as Readonly<{
-    buildRig?: (
-      context: ExtensionCommandContext,
-      env: EngineEnvironment,
-      options: Readonly<{ base: "empty" | "current" }>,
-    ) => Promise<void>
-  }>
-  if (module.buildRig === undefined) throw new Error("Rig builder is unavailable")
-  await module.buildRig(ctx, environment, { base })
+  await builderUi.buildRig(ctx, environment, { base })
 }
 
 function reportError(ctx: ExtensionCommandContext, error: unknown): void {
@@ -481,16 +465,7 @@ export async function openManager(
             const source = item.source
             done(undefined)
             run(async () => {
-              const modulePath = "./builder"
-              const module = await import(modulePath) as Readonly<{
-                editRig?: (
-                  context: ExtensionCommandContext,
-                  env: EngineEnvironment,
-                  name: string,
-                ) => Promise<void>
-              }>
-              if (module.editRig === undefined) throw new Error("Rig editor is unavailable")
-              await module.editRig(ctx, environment, source.name)
+              await builderUi.editRig(ctx, environment, source.name)
             })
             return
           }

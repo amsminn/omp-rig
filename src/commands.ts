@@ -25,6 +25,8 @@ import {
 } from "./scope"
 import * as store from "./store"
 import { validateRig } from "./validate"
+import * as managerUi from "./ui/manager"
+import * as builderUi from "./ui/builder"
 
 export const SUBCOMMANDS = [
   "list",
@@ -505,15 +507,7 @@ async function openManager(
   ctx: ExtensionCommandContext,
   environment: EngineEnvironment,
 ): Promise<void> {
-  const modulePath = "./ui/manager"
-  const module = await import(modulePath) as Readonly<{
-    openManager?: (
-      ctx: ExtensionCommandContext,
-      environment: EngineEnvironment,
-    ) => Promise<void>
-  }>
-  if (module.openManager === undefined) throw new Error("Rig manager is unavailable")
-  await module.openManager(ctx, environment)
+  await managerUi.openManager(ctx, environment)
 }
 
 async function openBuilder(
@@ -521,16 +515,7 @@ async function openBuilder(
   environment: EngineEnvironment,
   name?: string,
 ): Promise<void> {
-  const modulePath = "./ui/builder"
-  const module = await import(modulePath) as Readonly<{
-    buildRig?: (
-      ctx: ExtensionCommandContext,
-      environment: EngineEnvironment,
-      options: Readonly<{ name?: string }>,
-    ) => Promise<void>
-  }>
-  if (module.buildRig === undefined) throw new Error("Rig builder is unavailable")
-  await module.buildRig(ctx, environment, name === undefined ? {} : { name })
+  await builderUi.buildRig(ctx, environment, name === undefined ? {} : { name })
 }
 
 async function openEditor(
@@ -538,16 +523,7 @@ async function openEditor(
   environment: EngineEnvironment,
   name: string,
 ): Promise<void> {
-  const modulePath = "./ui/builder"
-  const module = await import(modulePath) as Readonly<{
-    editRig?: (
-      ctx: ExtensionCommandContext,
-      environment: EngineEnvironment,
-      name: string,
-    ) => Promise<void>
-  }>
-  if (module.editRig === undefined) throw new Error("Rig editor is unavailable")
-  await module.editRig(ctx, environment, name)
+  await builderUi.editRig(ctx, environment, name)
 }
 
 async function cycle(

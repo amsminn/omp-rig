@@ -27,6 +27,8 @@ import {
   type ScopeMarkers,
 } from "../scope"
 import * as store from "../store"
+import * as managerUi from "./manager"
+import * as builderUi from "./builder"
 
 // allow: SIZE_OK — this module owns the plan's complete action-menu and dialog state machine.
 export type ActionId =
@@ -483,15 +485,7 @@ async function openManager(
   ctx: ExtensionCommandContext,
   environment: EngineEnvironment,
 ): Promise<void> {
-  const modulePath = "./manager"
-  const module = await import(modulePath) as Readonly<{
-    openManager?: (
-      context: ExtensionCommandContext,
-      env: EngineEnvironment,
-    ) => Promise<void>
-  }>
-  if (module.openManager === undefined) throw new Error("Rig manager is unavailable")
-  await module.openManager(ctx, environment)
+  await managerUi.openManager(ctx, environment)
 }
 
 async function editRig(
@@ -499,16 +493,7 @@ async function editRig(
   environment: EngineEnvironment,
   name: string,
 ): Promise<void> {
-  const modulePath = "./builder"
-  const module = await import(modulePath) as Readonly<{
-    editRig?: (
-      context: ExtensionCommandContext,
-      env: EngineEnvironment,
-      rigName: string,
-    ) => Promise<void>
-  }>
-  if (module.editRig === undefined) throw new Error("Rig editor is unavailable")
-  await module.editRig(ctx, environment, name)
+  await builderUi.editRig(ctx, environment, name)
 }
 
 export async function saveCurrentSetup(
