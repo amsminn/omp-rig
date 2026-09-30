@@ -496,29 +496,6 @@ async function editRig(
   await builderUi.editRig(ctx, environment, name)
 }
 
-export async function saveCurrentSetup(
-  ctx: ExtensionCommandContext,
-  environment: EngineEnvironment,
-): Promise<void> {
-  const runtime = await createRuntime({
-    ctx,
-    environment,
-    source: null,
-    rig: rigFromSettings(environment.settings, environment),
-  })
-  const name = await inputRigName(runtime, "Rig name", "")
-  if (name === undefined) return
-  const description = await inputValue(ctx, "Description")
-  if (description === undefined) return
-  const rig = runtime.currentRig(description.trim() || undefined)
-  await runtime.write(name, rig)
-  runtime.ui.notify(`Rig '${name}' saved`, "info")
-  if (await runtime.ui.confirm("Apply now?", `Apply rig '${name}' to this session?`)) {
-    const result = await runtime.apply({ kind: "rig", name }, "session")
-    runtime.ui.notify(resultText(result), result.ok ? "info" : "error")
-  }
-}
-
 type RuntimeInput = Readonly<{
   ctx: ExtensionCommandContext
   environment: EngineEnvironment
