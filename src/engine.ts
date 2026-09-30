@@ -560,3 +560,29 @@ export async function drift(environment: EngineEnvironment): Promise<readonly st
     throw error
   }
 }
+
+/** Per-role annotations for the effective rig: inherited from its default, drifted, and saved to global config. */
+export async function roleNotes(
+  environment: EngineEnvironment,
+): Promise<Readonly<Record<string, readonly string[]>>> {
+  const selected = effective(await readMarkers(environment.scope))
+  if (selected.source === null || "missing" in selected.source) return {}
+  const rig = await loadSource(selected.source, environment.store)
+  const drifted = new Set(changedKeys(rig, environment, stateFor(environment).runtimeOwned))
+  const current = environment.settings.getModelRoles()
+  const globalRoles = environment.settings.getGlobalSettings()["modelRoles"] as Record<string, unknown> | undefined
+  const notes: Record<string, string[]> = {}
+  for (const [role, spec] of Object.entries(current)) {
+    if (spec === undefined) continue
+    const note: string[] = []
+    if (!Object.hasOwn(rig.modelRoles, role) && (spec === rig.modelRoles["default"] || drifted.has(role))) {
+      note.push("inherits default")
+    }
+    if (drifted.has(role)) {
+      note.push("drifted")
+      if (globalRoles?.[role] === spec) note.push("saved to global config")
+    }
+    notes[role] = note
+  }
+  return notes
+}

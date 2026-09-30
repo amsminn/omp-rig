@@ -6,7 +6,7 @@ import type {
 } from "@oh-my-pi/pi-coding-agent"
 import { getPluginSettings } from "@oh-my-pi/pi-coding-agent/extensibility/plugins/loader"
 import type { AutocompleteItem, KeyId } from "@oh-my-pi/pi-tui"
-import {
+import { roleNotes,
   applyRig,
   drift,
   effectivePool,
@@ -667,10 +667,14 @@ async function handleCommand(
     case "current": {
       const markers = await readMarkers(environment.scope)
       const selected = effective(markers)
+      const notes = await roleNotes(environment)
       const roles = Object.entries(environment.settings.getModelRoles())
         .filter((entry): entry is [string, string] => entry[1] !== undefined)
         .sort(([left], [right]) => left.localeCompare(right))
-        .map(([role, spec]) => `${role}=${spec}`)
+        .map(([role, spec]) => {
+          const note = notes[role] ?? []
+          return note.length === 0 ? `${role}=${spec}` : `${role}=${spec} (${note.join(", ")})`
+        })
       report(ctx, [
         `active=${selected.source === null
           ? "default"

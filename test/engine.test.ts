@@ -17,6 +17,7 @@ import {
   effectivePool,
   inherit,
   reconcile,
+  roleNotes,
   turnOff,
   type EngineEnvironment,
   type EngineStore,
@@ -552,4 +553,28 @@ test("validateRig leaves settings deep-equal before and after", async () => {
 
   expect(validResult.ok).toBe(true)
   expect(state(item.settings)).toEqual(before)
+})
+
+describe("role notes", () => {
+  test("marks inherited roles, drift, and drift saved to global config", async () => {
+    const { env, settings } = await harness({ b: RIG_B }, { globalRoles: { default: "p3/d", designer: "p1/a" } })
+    const applied = await applyRig(source("b"), "session", env)
+    expect(applied.ok).toBe(true)
+    let notes = await roleNotes(env)
+    expect(notes.designer).toEqual(["inherits default"])
+    expect(notes.default).toEqual([])
+
+    cfgModelRoles.override(settings, { ...settings.getModelRoles(), smol: "p1/b" })
+    notes = await roleNotes(env)
+    expect(notes.smol).toEqual(["inherits default", "drifted"])
+
+    cfgModelRoles.set(settings, { ...cfgModelRoles.get(settings), smol: "p1/b" })
+    notes = await roleNotes(env)
+    expect(notes.smol).toContain("saved to global config")
+  })
+
+  test("returns no notes when no rig is active", async () => {
+    const { env } = await harness({ b: RIG_B })
+    expect(await roleNotes(env)).toEqual({})
+  })
 })
