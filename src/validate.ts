@@ -1,4 +1,4 @@
-import { modelKind, type Model, type ModelKind } from "@oh-my-pi/pi-catalog/types"
+import { modelKind, type Model, type ModelKind } from "@oh-my-pi/pi-ai/types"
 import { MODEL_ROLES } from "@oh-my-pi/pi-coding-agent/config/model-roles"
 import { parseModelSpec, type Rig } from "./rig-file"
 

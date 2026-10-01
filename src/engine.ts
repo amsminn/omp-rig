@@ -1,5 +1,5 @@
 import { ThinkingLevel } from "@oh-my-pi/pi-agent-core/thinking"
-import type { Model, ModelKind } from "@oh-my-pi/pi-catalog/types"
+import type { Model, ModelKind } from "@oh-my-pi/pi-ai/types"
 import type { Settings } from "@oh-my-pi/pi-coding-agent/config/settings"
 import {
   captureBaseline,

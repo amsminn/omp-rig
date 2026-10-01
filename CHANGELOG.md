@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix `omp plugin install omp-rig` failing on 0.1.2 with "Cannot find package '@oh-my-pi/pi-catalog'"; the plugin now only uses packages omp provides.
+
 ## 0.1.2 - 2026-10-01
 
 - `npx omp-rig install` no longer downloads omp itself; it uses the omp already on your machine and fails with a clear message when omp is missing.

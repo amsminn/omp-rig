@@ -1,4 +1,4 @@
-import type { Model } from "@oh-my-pi/pi-catalog/types"
+import type { Model } from "@oh-my-pi/pi-ai/types"
 import type { ThinkingLevel } from "@oh-my-pi/pi-agent-core/thinking"
 import { MODEL_ROLES } from "@oh-my-pi/pi-coding-agent/config/model-roles"
 import type { Settings } from "@oh-my-pi/pi-coding-agent/config/settings"

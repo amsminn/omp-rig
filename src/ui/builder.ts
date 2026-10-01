@@ -1,4 +1,4 @@
-import type { Model } from "@oh-my-pi/pi-catalog/types"
+import type { Model } from "@oh-my-pi/pi-ai/types"
 import {
   getSelectListTheme,
   getSettingsListTheme,
