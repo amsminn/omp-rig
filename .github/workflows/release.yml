@@ -61,7 +61,7 @@ jobs:
           version="${{ steps.version.outputs.value }}"
           git commit -am "chore: release v$version"
           git tag "v$version"
-          git push origin HEAD:main --follow-tags
+          git push --atomic origin HEAD:main "refs/tags/v$version"
       - name: Publish package
         run: npm publish --access public
       - name: Create GitHub release
