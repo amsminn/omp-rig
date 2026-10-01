@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.2 - 2026-10-01
+
 - `npx omp-rig install` no longer downloads omp itself; it uses the omp already on your machine and fails with a clear message when omp is missing.
 
 ## 0.1.1 - 2026-10-01
