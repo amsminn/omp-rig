@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.4 - 2026-10-01
+
 - `+ Save current setup as new rig` now saves the models you are using right away: it asks only for a name and a description instead of starting the builder over.
 - Saved rigs are written as readable multi-line YAML, and a rig saved while omp shows every model no longer pins an empty model pool.
 - `/rigs` is gone; use `/rig`.
