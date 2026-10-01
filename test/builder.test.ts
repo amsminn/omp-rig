@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import {
   applyModelToRoles,
+  builderBase,
   enabledModelsForProviders,
   rolesFromBase,
 } from "../src/ui/builder"
@@ -88,5 +89,21 @@ describe("builder pool reducer", () => {
 
     // Then
     expect(enabledModels).toBeUndefined()
+  })
+})
+
+describe("builder start point", () => {
+  test("uses an explicit start point instead of asking for one", () => {
+    expect(builderBase("empty")).toEqual({ kind: "empty" })
+    expect(builderBase("current")).toEqual({ kind: "current" })
+    expect(builderBase({ modelRoles: { default: "inferhub/glm-5.3" } })).toEqual({
+      kind: "rig",
+      name: "base",
+      rig: { modelRoles: { default: "inferhub/glm-5.3" } },
+    })
+  })
+
+  test("asks for a start point only when none is given", () => {
+    expect(builderBase(undefined)).toBeUndefined()
   })
 })

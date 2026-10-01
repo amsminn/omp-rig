@@ -10,7 +10,7 @@ import {
   type SelectItem,
 } from "@oh-my-pi/pi-tui"
 import { getSelectListTheme } from "@oh-my-pi/pi-tui/theme"
-import {
+import { currentSetupRig,
   applyRig,
   effectivePool,
   inherit,
@@ -350,30 +350,6 @@ export async function dispatchAction(
   }
 }
 
-function rigFromSettings(
-  settings: EngineEnvironment["settings"],
-  environment: EngineEnvironment,
-  description?: string,
-): Rig {
-  const modelRoles = Object.fromEntries(
-    Object.entries(settings.getModelRoles())
-      .filter((entry): entry is [string, string] => entry[1] !== undefined),
-  )
-  if (modelRoles["default"] === undefined) {
-    const model = environment.ctx.model
-    if (model !== undefined) modelRoles["default"] = `${model.provider}/${model.id}`
-  }
-  if (modelRoles["default"] === undefined) {
-    throw new Error("Current setup has no default model role")
-  }
-  return {
-    ...(description === undefined ? {} : { description }),
-    modelRoles,
-    enabledModels: [...environment.handles.enabledModels.get(settings)],
-    disabledProviders: [...environment.handles.disabledProviders.get(settings)],
-  }
-}
-
 async function loadSource(
   source: RigSource | null,
   environment: EngineEnvironment,
@@ -383,7 +359,7 @@ async function loadSource(
       cwd: environment.scope.cwd,
       agentDir: environment.scope.agentDir,
     })
-    return rigFromSettings(settings, environment)
+    return currentSetupRig({ ...environment, settings })
   }
   if (source.kind === "rig") return store.read(source.name)
   const profile = (await store.listProfiles())
@@ -526,7 +502,7 @@ async function createRuntime(
     detailLines,
     roleCount: () => Object.keys(environment.settings.getModelRoles()).length,
     currentRig: description =>
-      rigFromSettings(environment.settings, environment, description),
+      currentSetupRig(environment, description),
     listRigNames: async () => (await store.list()).map(entry => entry.name),
     apply: (selected, scope) => applyRig(selected, scope, environment),
     turnOff: scope => turnOff(scope, environment),
@@ -561,4 +537,27 @@ export async function openActions(
   }
   const outcome = await dispatchAction(action, runtime)
   if (outcome === "refresh") await openManager(ctx, environment)
+}
+
+export async function saveCurrentSetup(
+  ctx: ExtensionCommandContext,
+  environment: EngineEnvironment,
+): Promise<void> {
+  const runtime = await createRuntime({
+    ctx,
+    environment,
+    source: null,
+    rig: currentSetupRig(environment),
+  })
+  const name = await inputRigName(runtime, "Rig name", "")
+  if (name === undefined) return
+  const description = await inputValue(ctx, "Description")
+  if (description === undefined) return
+  const rig = runtime.currentRig(description.trim() || undefined)
+  await runtime.write(name, rig)
+  runtime.ui.notify(`Rig '${name}' saved`, "info")
+  if (await runtime.ui.confirm("Apply now?", `Apply rig '${name}' to this session?`)) {
+    const result = await runtime.apply({ kind: "rig", name }, "session")
+    runtime.ui.notify(resultText(result), result.ok ? "info" : "error")
+  }
 }

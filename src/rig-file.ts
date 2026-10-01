@@ -231,12 +231,13 @@ export function parseRig(text: string, fileName: string): ParseRigResult {
 }
 
 export function serializeRig(rig: Rig): string {
-  return `${Bun.YAML.stringify({
+  const yaml = Bun.YAML.stringify({
     ...(rig.description === undefined ? {} : { description: rig.description }),
     modelRoles: rig.modelRoles,
     ...(rig.enabledModels === undefined ? {} : { enabledModels: rig.enabledModels }),
     ...(rig.disabledProviders === undefined
       ? {}
       : { disabledProviders: rig.disabledProviders }),
-  })}\n`
+  }, null, 2)
+  return `${yaml.split("\n").map(line => line.trimEnd()).join("\n").trimEnd()}\n`
 }

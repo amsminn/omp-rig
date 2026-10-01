@@ -6,7 +6,7 @@ import type {
 } from "@oh-my-pi/pi-coding-agent"
 import { getPluginSettings } from "@oh-my-pi/pi-coding-agent/extensibility/plugins/loader"
 import type { AutocompleteItem, KeyId } from "@oh-my-pi/pi-tui"
-import { roleNotes,
+import { currentSetupRig, roleNotes,
   applyRig,
   drift,
   effectivePool,
@@ -436,23 +436,6 @@ function profileText(name: string, rig: Rig): string {
   return rigText(name, rig).replace(/^rig:/, "profile:")
 }
 
-function currentRig(environment: EngineEnvironment, description?: string): Rig {
-  const { settings, handles } = environment
-  const modelRoles = Object.fromEntries(
-    Object.entries(settings.getModelRoles())
-      .filter((entry): entry is [string, string] => entry[1] !== undefined),
-  )
-  if (modelRoles["default"] === undefined) {
-    throw new Error("Current setup has no default model role")
-  }
-  return {
-    ...(description === undefined || description.length === 0 ? {} : { description }),
-    modelRoles,
-    enabledModels: [...handles.enabledModels.get(settings)],
-    disabledProviders: [...handles.disabledProviders.get(settings)],
-  }
-}
-
 function resultMessage(result: EngineResult): string {
   if (result.ok) return result.summary
   return [...result.errors, ...result.warnings].join("\n")
@@ -671,7 +654,7 @@ async function handleCommand(
       if (first === undefined) {
         await openBuilder(ctx, environment)
       } else {
-        await store.write(first, currentRig(environment))
+        await store.write(first, currentSetupRig(environment))
         report(ctx, `rig:${first} saved`)
       }
       return
@@ -680,7 +663,7 @@ async function handleCommand(
       return
     case "update":
       await store.read(first ?? "")
-      await store.write(first ?? "", currentRig(environment))
+      await store.write(first ?? "", currentSetupRig(environment))
       report(ctx, `rig:${first} updated`)
       return
     case "rename":
@@ -746,7 +729,6 @@ async function handleCommand(
         `/rig <name> ${SCOPE_HINT}`,
         "/rig rig:<name> | profile:<name>",
         ...SUBCOMMANDS.map(command => USAGE[command]),
-        "/rigs is an alias for /rig",
       ].join("\n"))
       return
   }
@@ -766,7 +748,7 @@ function installInlineHints(
           cursorColumn: number,
         ): string | null => {
           const beforeCursor = (lines[cursorLine] ?? "").slice(0, cursorColumn)
-          const match = /^\s*\/rigs?\s(.*)$/.exec(beforeCursor)
+          const match = /^\s*\/rig\s(.*)$/.exec(beforeCursor)
           const hint = match === null ? null : inlineHint(match[1] ?? "", sources)
           const fallback = Reflect.get(target, property, target)
           return hint ?? (typeof fallback === "function"
@@ -811,13 +793,11 @@ export function registerRigCommands(
     argumentCompletions(prefix, sources)
 
   if (typeof pi.registerCommand === "function") {
-    for (const name of ["rig", "rigs"]) {
-      pi.registerCommand(name, {
-        description: "Switch, inspect, and manage model rigs",
-        getArgumentCompletions,
-        handler,
-      })
-    }
+    pi.registerCommand("rig", {
+      description: "Switch, inspect, and manage model rigs",
+      getArgumentCompletions,
+      handler,
+    })
   }
 
   return {

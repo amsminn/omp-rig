@@ -134,7 +134,7 @@ disabledProviders: [anthropic]
 | `/rig export <name> [file]` | 导出 rig 文件 |
 | `/rig help` | 显示命令帮助 |
 
-`/rigs` 是 `/rig` 的别名。子命令、rig 名称和 `--scope` 的取值都有补全和行内提示，直接输入的命令在 print 和 RPC 模式下同样可用。
+子命令、rig 名称和 `--scope` 的取值都有补全和行内提示，直接输入的命令在 print 和 RPC 模式下同样可用。
 
 启动 omp 时就为会话应用一个 rig：
 

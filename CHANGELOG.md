@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `+ Save current setup as new rig` now saves the models you are using right away: it asks only for a name and a description instead of starting the builder over.
+- Saved rigs are written as readable multi-line YAML, and a rig saved while omp shows every model no longer pins an empty model pool.
+- `/rigs` is gone; use `/rig`.
+
 ## 0.1.3 - 2026-10-01
 
 - Fix `omp plugin install omp-rig` failing on 0.1.2 with "Cannot find package '@oh-my-pi/pi-catalog'"; the plugin now only uses packages omp provides.

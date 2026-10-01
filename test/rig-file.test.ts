@@ -220,3 +220,27 @@ describe("validateRigName", () => {
     expect(validateRigName("cn.fast_1")).toBeUndefined()
   })
 })
+
+describe("rig file writing", () => {
+  test("writes block-style YAML that reads back unchanged", () => {
+    const rig = {
+      description: "Claude for everyday work",
+      modelRoles: { default: "anthropic/claude-sonnet-4-5:medium", smol: "anthropic/claude-haiku-4-5:low" },
+      enabledModels: ["anthropic/*"],
+    }
+
+    const text = serializeRig(rig)
+
+    expect(text).toBe([
+      "description: Claude for everyday work",
+      "modelRoles:",
+      "  default: anthropic/claude-sonnet-4-5:medium",
+      "  smol: anthropic/claude-haiku-4-5:low",
+      "enabledModels:",
+      "  - anthropic/*",
+      "",
+    ].join("\n"))
+    const parsed = parseRig(text, "cc.yml")
+    expect(parsed.ok && parsed.rig).toEqual(rig)
+  })
+})

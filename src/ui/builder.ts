@@ -541,6 +541,13 @@ function checkedRig(
   return validation.ok ? parsed.rig : undefined
 }
 
+export function builderBase(base: BuildRigOptions["base"]): BuilderBase | undefined {
+  if (base === undefined) return undefined
+  if (base === "empty") return { kind: "empty" }
+  if (base === "current") return { kind: "current" }
+  return { kind: "rig", name: "base", rig: base }
+}
+
 export async function buildRig(
   ctx: ExtensionCommandContext,
   environment: EngineEnvironment,
@@ -554,10 +561,7 @@ export async function buildRig(
 
   const current = currentRoles(environment)
   const entries = await store.list()
-  let base: BuilderBase | undefined = options.base === undefined
-    || typeof options.base === "string"
-    ? undefined
-    : { kind: "rig", name: "base", rig: options.base }
+  let base: BuilderBase | undefined = builderBase(options.base)
   if (base === undefined) {
     const choice = await selectValue(ctx, "Start from", [
       { value: "empty", label: "Empty" },

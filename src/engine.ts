@@ -653,3 +653,27 @@ function definedRoles(value: unknown): Record<string, string> {
     Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === "string" && entry[1] !== ""),
   )
 }
+
+/** The setup omp is using right now as a rig; pool fields are left out when omp shows every model. */
+export function currentSetupRig(environment: EngineEnvironment, description?: string): Rig {
+  const { settings, handles } = environment
+  const modelRoles = Object.fromEntries(
+    Object.entries(settings.getModelRoles())
+      .filter((entry): entry is [string, string] => entry[1] !== undefined),
+  )
+  const active = environment.ctx.model
+  if (modelRoles["default"] === undefined && active !== undefined) {
+    modelRoles["default"] = `${active.provider}/${active.id}`
+  }
+  if (modelRoles["default"] === undefined) {
+    throw new Error("Current setup has no default model role")
+  }
+  const enabledModels = [...handles.enabledModels.get(settings)]
+  const disabledProviders = [...handles.disabledProviders.get(settings)]
+  return {
+    ...(description === undefined || description.length === 0 ? {} : { description }),
+    modelRoles,
+    ...(enabledModels.length === 0 ? {} : { enabledModels }),
+    ...(disabledProviders.length === 0 ? {} : { disabledProviders }),
+  }
+}

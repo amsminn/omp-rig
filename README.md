@@ -134,7 +134,7 @@ With `cn` active, Ctrl+P and `/model` offer only inferhub models, and neither th
 | `/rig export <name> [file]` | Export a rig file |
 | `/rig help` | Show command help |
 
-`/rigs` is an alias for `/rig`. Subcommands, rig names and `--scope` values have completions and inline hints, and typed commands also work in print and RPC modes.
+Subcommands, rig names and `--scope` values have completions and inline hints, and typed commands also work in print and RPC modes.
 
 To start omp with a rig already applied to the session:
 

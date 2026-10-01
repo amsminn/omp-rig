@@ -134,7 +134,7 @@ disabledProviders: [anthropic]
 | `/rig export <name> [file]` | rig 파일 내보내기 |
 | `/rig help` | 명령어 도움말 보기 |
 
-`/rigs`는 `/rig`의 별칭입니다. 하위 명령, rig 이름, `--scope` 값에는 자동 완성과 인라인 힌트가 붙고, 직접 입력한 명령은 print 모드와 RPC 모드에서도 동작합니다.
+하위 명령, rig 이름, `--scope` 값에는 자동 완성과 인라인 힌트가 붙고, 직접 입력한 명령은 print 모드와 RPC 모드에서도 동작합니다.
 
 세션에 rig를 적용한 채로 omp를 시작하려면:
 

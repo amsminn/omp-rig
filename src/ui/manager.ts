@@ -254,9 +254,15 @@ async function openActions(
 async function openBuilder(
   ctx: ExtensionCommandContext,
   environment: EngineEnvironment,
-  base: "empty" | "current",
 ): Promise<void> {
-  await builderUi.buildRig(ctx, environment, { base })
+  await builderUi.buildRig(ctx, environment, { base: "empty" })
+}
+
+async function saveCurrent(
+  ctx: ExtensionCommandContext,
+  environment: EngineEnvironment,
+): Promise<void> {
+  await actionsUi.saveCurrentSetup(ctx, environment)
 }
 
 function reportError(ctx: ExtensionCommandContext, error: unknown): void {
@@ -381,11 +387,11 @@ export async function openManager(
       switch (item.action) {
         case "save":
           done(undefined)
-          await openBuilder(ctx, environment, "current")
+          await saveCurrent(ctx, environment)
           return
         case "build":
           done(undefined)
-          await openBuilder(ctx, environment, "empty")
+          await openBuilder(ctx, environment)
           return
         case "off": {
           if (!await ctx.ui.confirm(
@@ -471,12 +477,12 @@ export async function openManager(
           }
           if (matchesKey(data, "ctrl+n")) {
             done(undefined)
-            run(() => openBuilder(ctx, environment, "empty"))
+            run(() => openBuilder(ctx, environment))
             return
           }
           if (matchesKey(data, "ctrl+s")) {
             done(undefined)
-            run(() => openBuilder(ctx, environment, "current"))
+            run(() => saveCurrent(ctx, environment))
             return
           }
         }

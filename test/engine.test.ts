@@ -14,6 +14,7 @@ import { join } from "node:path"
 import {
   applyRig,
   baselineView,
+  currentSetupRig,
   drift,
   effectivePool,
   inherit,
@@ -633,5 +634,28 @@ describe("tree navigation before an apply", () => {
     expect(item.session.model).toBe(CHAT_C)
     expect(item.session.level).toBe(ThinkingLevel.XHigh)
     expect(item.settings.getModelRoles()).toEqual({})
+  })
+})
+
+describe("current setup snapshot", () => {
+  test("leaves the pool unset when omp shows every model", async () => {
+    const { env } = await harness({}, { globalRoles: { default: "p3/d", smol: "p1/b" } })
+
+    expect(currentSetupRig(env, "today")).toEqual({
+      description: "today",
+      modelRoles: { default: "p3/d", smol: "p1/b" },
+    })
+  })
+
+  test("keeps a restricted pool", async () => {
+    const { env, settings } = await harness({}, { globalRoles: { default: "p3/d" } })
+    cfgEnabledModels.set(settings, ["p1/*"])
+    cfgDisabledProviders.set(settings, ["p2"])
+
+    expect(currentSetupRig(env)).toEqual({
+      modelRoles: { default: "p3/d" },
+      enabledModels: ["p1/*"],
+      disabledProviders: ["p2"],
+    })
   })
 })
