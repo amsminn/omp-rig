@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Install from any machine with `npx omp-rig install`, which runs `omp plugin install omp-rig@latest` for you; `npx omp-rig uninstall` removes it.
+
+## 0.1.0 - 2026-10-01
+
 - Switch every configured model role and visible model pool together from the `/rig` list.
 - Apply a rig for the current session, project, or profile-wide default without rewriting saved settings.
 - Create, edit, copy, rename, import, and export rigs from the interactive menu.

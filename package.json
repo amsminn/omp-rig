@@ -5,7 +5,10 @@
   "type": "module",
   "license": "MIT",
   "author": "Chaewan Kim",
-  "repository": "git+https://github.com/amsminn/omp-rig.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amsminn/omp-rig.git"
+  },
   "homepage": "https://github.com/amsminn/omp-rig",
   "bugs": {
     "url": "https://github.com/amsminn/omp-rig/issues"
@@ -19,12 +22,16 @@
     "cli",
     "tui"
   ],
+  "bin": {
+    "omp-rig": "bin/omp-rig.js"
+  },
   "omp": {
     "extensions": [
       "./src/index.ts"
     ]
   },
   "files": [
+    "bin",
     "src",
     "README.md",
     "README.zh-CN.md",

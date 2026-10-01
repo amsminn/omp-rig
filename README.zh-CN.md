@@ -40,6 +40,12 @@ omp plugin install omp-rig
 omp plugin install github:amsminn/omp-rig
 ```
 
+在新机器上也可以用 npx 安装，它会替你运行 `omp plugin install omp-rig@latest`：
+
+```bash
+npx omp-rig install
+```
+
 然后在 omp 里输入：
 
 ```text

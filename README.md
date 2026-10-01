@@ -40,6 +40,12 @@ You can also install straight from GitHub:
 omp plugin install github:amsminn/omp-rig
 ```
 
+On a new machine you can also use npx, which runs `omp plugin install omp-rig@latest` for you:
+
+```bash
+npx omp-rig install
+```
+
 Then, inside omp:
 
 ```text

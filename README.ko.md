@@ -40,6 +40,12 @@ GitHub에서 바로 설치할 수도 있습니다.
 omp plugin install github:amsminn/omp-rig
 ```
 
+새 머신에서는 npx로 설치해도 됩니다. `omp plugin install omp-rig@latest`를 대신 실행해 줍니다.
+
+```bash
+npx omp-rig install
+```
+
 그다음 omp 안에서 입력하세요.
 
 ```text
