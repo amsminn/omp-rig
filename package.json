@@ -1,6 +1,6 @@
 {
   "name": "omp-rig",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Switch every omp model role and model pool at once from an interactive list",
   "type": "module",
   "license": "MIT",

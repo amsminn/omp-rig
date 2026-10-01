@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.1 - 2026-10-01
+
 - Install from any machine with `npx omp-rig install`, which runs `omp plugin install omp-rig@latest` for you; `npx omp-rig uninstall` removes it.
 
 ## 0.1.0 - 2026-10-01
