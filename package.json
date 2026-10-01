@@ -51,5 +51,10 @@
   },
   "peerDependencies": {
     "@oh-my-pi/pi-coding-agent": ">=18.3.1 <19"
+  },
+  "peerDependenciesMeta": {
+    "@oh-my-pi/pi-coding-agent": {
+      "optional": true
+    }
   }
 }

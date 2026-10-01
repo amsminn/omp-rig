@@ -31,19 +31,14 @@ omp-rig 是 [omp](https://github.com/can1357/oh-my-pi) 编程智能体的插件�
 ## 快速开始
 
 ```bash
-omp plugin install omp-rig
-```
-
-也可以直接从 GitHub 安装：
-
-```bash
-omp plugin install github:amsminn/omp-rig
-```
-
-在新机器上也可以用 npx 安装，它会替你运行 `omp plugin install omp-rig@latest`：
-
-```bash
 npx omp-rig install
+```
+
+它会替你运行 `omp plugin install omp-rig@latest`，所以需要先装好 omp；没有 omp 时安装会失败。也可以直接用 omp 安装，或者从 GitHub 安装：
+
+```bash
+omp plugin install omp-rig
+omp plugin install github:amsminn/omp-rig
 ```
 
 然后在 omp 里输入：

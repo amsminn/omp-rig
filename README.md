@@ -31,19 +31,14 @@ omp-rig is a plugin for the [omp](https://github.com/can1357/oh-my-pi) coding ag
 ## Quickstart
 
 ```bash
-omp plugin install omp-rig
-```
-
-You can also install straight from GitHub:
-
-```bash
-omp plugin install github:amsminn/omp-rig
-```
-
-On a new machine you can also use npx, which runs `omp plugin install omp-rig@latest` for you:
-
-```bash
 npx omp-rig install
+```
+
+This runs `omp plugin install omp-rig@latest` for you, so omp has to be installed first; without omp the command fails. You can also install with omp directly, or straight from GitHub:
+
+```bash
+omp plugin install omp-rig
+omp plugin install github:amsminn/omp-rig
 ```
 
 Then, inside omp:

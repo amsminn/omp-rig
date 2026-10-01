@@ -31,19 +31,14 @@ omp-rig는 [omp](https://github.com/can1357/oh-my-pi) 코딩 에이전트용 플
 ## 빠른 시작
 
 ```bash
-omp plugin install omp-rig
-```
-
-GitHub에서 바로 설치할 수도 있습니다.
-
-```bash
-omp plugin install github:amsminn/omp-rig
-```
-
-새 머신에서는 npx로 설치해도 됩니다. `omp plugin install omp-rig@latest`를 대신 실행해 줍니다.
-
-```bash
 npx omp-rig install
+```
+
+`omp plugin install omp-rig@latest`를 대신 실행하므로 omp가 먼저 설치돼 있어야 합니다. omp가 없으면 설치는 실패합니다. omp로 직접 설치하거나 GitHub에서 바로 설치할 수도 있습니다.
+
+```bash
+omp plugin install omp-rig
+omp plugin install github:amsminn/omp-rig
 ```
 
 그다음 omp 안에서 입력하세요.
