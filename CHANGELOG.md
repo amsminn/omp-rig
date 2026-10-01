@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.3 - 2026-10-01
+
 - Fix `omp plugin install omp-rig` failing on 0.1.2 with "Cannot find package '@oh-my-pi/pi-catalog'"; the plugin now only uses packages omp provides.
 
 ## 0.1.2 - 2026-10-01
